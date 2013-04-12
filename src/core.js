@@ -1,7 +1,7 @@
 /**
  * Handsontable constructor
  * @param rootElement The jQuery element in which Handsontable DOM will be inserted
- * @param settings
+ * @param settingsConstructor
  * @constructor
  */
 Handsontable.Core = function (rootElement, settingsConstructor) {
@@ -1688,7 +1688,7 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
    * @public
    */
   this.updateSettings = function (settings, init) {
-    var i;
+    var i, r, rlen, c, clen;
 
     if (typeof settings.rows !== "undefined") {
       throw new Error("'rows' setting is no longer supported. do you mean startRows, minRows or maxRows?");
@@ -1726,9 +1726,9 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
     if (settings.data === void 0 && priv.settings.data === void 0) {
       var data = [];
       var row;
-      for (var r = 0, rlen = priv.settings.startRows; r < rlen; r++) {
+      for (r = 0, rlen = priv.settings.startRows; r < rlen; r++) {
         row = [];
-        for (var c = 0, clen = priv.settings.startCols; c < clen; c++) {
+        for (c = 0, clen = priv.settings.startCols; c < clen; c++) {
           row.push(null);
         }
         data.push(row);
@@ -1743,7 +1743,7 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
     }
 
     // Init columns constructors configuration
-    var clen = self.countCols();
+    clen = self.countCols();
 
     if (clen > 0) {
       var prop, proto, column;
@@ -1919,7 +1919,8 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
    * @return {Object}
    */
   this.getCellMeta = function (row, col) {
-    var cellConstructor = function () {}
+    var cellConstructor = function () {
+      }
       , prop = datamap.colToProp(col)
       , cellProperties
       , type
@@ -2296,37 +2297,38 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
   this.version = '@@version'; //inserted by grunt from package.json
 };
 
-var defaultsConstructor = function () {};
-    defaultsConstructor.prototype = {
-      data : void 0,
-      width : void 0,
-      height : void 0,
-      startRows : 5,
-      startCols : 5,
-      minRows : 0,
-      minCols : 0,
-      maxRows : Infinity,
-      maxCols : Infinity,
-      minSpareRows : 0,
-      minSpareCols : 0,
-      multiSelect : true,
-      fillHandle : true,
-      undo : true,
-      outsideClickDeselects : true,
-      enterBeginsEditing : true,
-      enterMoves : {row: 1, col: 0},
-      tabMoves : {row: 0, col: 1},
-      autoWrapRow : false,
-      autoWrapCol : false,
-      copyRowsLimit : 1000,
-      copyColsLimit : 1000,
-      currentRowClassName : void 0,
-      currentColClassName : void 0,
-      asyncRendering : true,
-      stretchH : 'hybrid',
-      isEmptyRow : void 0,
-      isEmptyCol : void 0
-    };
+var defaultsConstructor = function () {
+};
+defaultsConstructor.prototype = {
+  data: void 0,
+  width: void 0,
+  height: void 0,
+  startRows: 5,
+  startCols: 5,
+  minRows: 0,
+  minCols: 0,
+  maxRows: Infinity,
+  maxCols: Infinity,
+  minSpareRows: 0,
+  minSpareCols: 0,
+  multiSelect: true,
+  fillHandle: true,
+  undo: true,
+  outsideClickDeselects: true,
+  enterBeginsEditing: true,
+  enterMoves: {row: 1, col: 0},
+  tabMoves: {row: 0, col: 1},
+  autoWrapRow: false,
+  autoWrapCol: false,
+  copyRowsLimit: 1000,
+  copyColsLimit: 1000,
+  currentRowClassName: void 0,
+  currentColClassName: void 0,
+  asyncRendering: true,
+  stretchH: 'hybrid',
+  isEmptyRow: void 0,
+  isEmptyCol: void 0
+};
 
 $.fn.handsontable = function (action) {
   var i, ilen, args, output = [], userSettings;
@@ -2339,9 +2341,11 @@ $.fn.handsontable = function (action) {
         instance.updateSettings(userSettings);
       }
       else {
-        var instance, settingsConstructor = function () {};
+        var instance
+          , settingsConstructor = function () {
+          };
 
-        Handsontable.helper.inherit(settingsConstructor, defaultsConstructor);
+        settingsConstructor.prototype = new defaultsConstructor();
 
         for (i in userSettings) {
           if (userSettings.hasOwnProperty(i)) {
