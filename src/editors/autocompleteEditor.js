@@ -33,12 +33,19 @@ HandsontableAutocompleteEditorClass.prototype.createElements = function () {
   var _process = this.typeahead.process;
   var that = this;
   this.typeahead.process = function (items) {
+    var cloned = false;
     for (var i = 0, ilen = items.length; i < ilen; i++) {
       if (items[i] === '') {
         //this is needed because because of issue #254
         //empty string ('') is a falsy value and breaks the loop in bootstrap-typeahead.js method `sorter`
         //best solution would be to change line: `while (item = items.shift()) {`
         //                                   to: `while ((item = items.shift()) !== void 0) {`
+        if (!cloned) {
+          //need to clone items before applying emptyStringLabel
+          //(otherwise validateChanges fails for empty string)
+          items = $.extend([], items);
+          cloned = true;
+        }
         items[i] = that.emptyStringLabel;
       }
     }
@@ -51,8 +58,6 @@ HandsontableAutocompleteEditorClass.prototype.createElements = function () {
  */
 HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
   var that = this;
-
-  this.typeahead.listen();
 
   this.$textarea.off('keydown').off('keyup').off('keypress'); //unlisten
 
@@ -118,16 +123,16 @@ HandsontableAutocompleteEditorClass.prototype.bindTemporaryEvents = function (td
   /* overwrite typeahead options and methods (matcher, sorter, highlighter, updater, etc) if provided in cellProperties */
   for (i in cellProperties) {
     // if (cellProperties.hasOwnProperty(i)) {
-      if (i === 'options') {
-        for (j in cellProperties.options) {
-          // if (cellProperties.options.hasOwnProperty(j)) {
-            this.typeahead.options[j] = cellProperties.options[j];
-          // }
-        }
+    if (i === 'options') {
+      for (j in cellProperties.options) {
+        // if (cellProperties.options.hasOwnProperty(j)) {
+        this.typeahead.options[j] = cellProperties.options[j];
+        // }
       }
-      else {
-        this.typeahead[i] = cellProperties[i];
-      }
+    }
+    else {
+      this.typeahead[i] = cellProperties[i];
+    }
     // }
   }
 
