@@ -1919,9 +1919,7 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
    * @return {Object}
    */
   this.getCellMeta = function (row, col) {
-    var cellConstructor = function () {
-      }
-      , prop = datamap.colToProp(col)
+    var prop = datamap.colToProp(col)
       , cellProperties
       , type
       , i;
@@ -1930,7 +1928,7 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
       priv.columnsConstructor[col] = Handsontable.helper.columnFactory(priv.settingsConstructor, priv.columnsSettingConflicts, Handsontable.TextCell);
     }
 
-    cellConstructor.prototype = new priv.columnsConstructor[col]();
+    cellProperties = new priv.columnsConstructor[col]();
 
     if (priv.settings.cells) {
       var settings = priv.settings.cells(row, col, prop) || {}
@@ -1938,13 +1936,11 @@ Handsontable.Core = function (rootElement, settingsConstructor) {
 
       for (key in settings) {
         if (settings.hasOwnProperty(key)) {
-          cellConstructor.prototype[key] = settings[key];
+          cellProperties[key] = settings[key];
         }
       }
 
     }
-
-    cellProperties = new cellConstructor();
 
     Handsontable.PluginHooks.run(self, 'beforeGetCellMeta', row, col, cellProperties);
 
