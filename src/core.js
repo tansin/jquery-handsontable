@@ -473,6 +473,7 @@ Handsontable.Core = function (rootElement, settings) {
         }
       }
 
+      /* tansin: we don't need this feature:
       if (priv.settings.enterBeginsEditing) {
         for (; (((priv.settings.minRows || priv.settings.minSpareRows) && self.countRows() > priv.settings.minRows) && (priv.settings.minSpareRows && emptyRows > priv.settings.minSpareRows)); emptyRows--) {
           datamap.removeRow();
@@ -484,6 +485,7 @@ Handsontable.Core = function (rootElement, settings) {
           datamap.removeCol();
         }
       }
+      */
 
       var rowCount = self.countRows();
       var colCount = self.countCols();
